@@ -47,7 +47,7 @@ def detect(stream, type_stream, min_area=500, debug_mode=False, full_debug=False
         # jesli nie udalo sie odczytac frama to program konczy sie
         if frame is None:
             running=False
-
+        maskCoords = MenuHandler.getMaskCoords()
         # najpierw mały resize, a nastepnie stosujemy maske
         frame = imutils.resize(frame, width=500)
         masked_frame = apply_mask(frame)
@@ -90,7 +90,9 @@ def detect(stream, type_stream, min_area=500, debug_mode=False, full_debug=False
                 (x, y, w, h) = cv2.boundingRect(contour)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 last_captured = ALERT_TIME
-
+        
+        if(maskCoords!=None):
+            cv2.rectangle(frame,(maskCoords[0],maskCoords[1]),(maskCoords[2],maskCoords[3]),(255,255,255),2)
         # jesli wykryto ruch to odlicza czas, w ktorym pokazuje alert
         if last_captured > 0:
             cv2.putText(frame, "Motion Detected!", (10, 20),
