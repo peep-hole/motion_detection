@@ -1,5 +1,6 @@
 from imutils.video import VideoStream
 from PIL import ImageTk, Image
+import numpy as np
 import datetime
 import argparse
 import os
@@ -70,6 +71,13 @@ def detect(stream, type_stream, min_area=500, debug_mode=False, full_debug=False
         frame_diff = cv2.absdiff(base_frame, blurred)
 
         masked_thresh = cv2.threshold(masked_frame_diff, 25, 255, cv2.THRESH_BINARY)[1]
+        if(maskCoords != None and maskCoords.__len__()>1):
+            x = min(maskCoords[0],maskCoords[2])
+            y=  min(maskCoords[1],maskCoords[3])
+            rows,cols=masked_thresh.shape
+            M = np.float32([[1,0,x],[0,1,y]])
+            masked_thresh=masked_thresh[min(maskCoords[1],maskCoords[3]):max(maskCoords[3],maskCoords[1]),min(maskCoords[0],maskCoords[2]):max(maskCoords[0],maskCoords[2])]
+            masked_thresh=cv2.warpAffine(masked_thresh,M,(cols,rows))
         thresh = cv2.threshold(frame_diff, 25, 255, cv2.THRESH_BINARY)[1]
 
         # to co ponizej poszerza nasz threshold, tzn. gdybysmy pokazali durszlak(aka sitko) z bliska to wypełni to jego
